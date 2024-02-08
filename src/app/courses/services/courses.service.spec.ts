@@ -26,8 +26,8 @@ describe('CoursesService', () => {
 
     it('should retrieve all courses', () => {
         coursesService.findAllCourses().subscribe(courses => {
-            expect(courses).toBeTruthy('No courses returned');
-            expect(courses.length).toBe(12, 'incorrect number of courses');
+            expect(courses).withContext('No courses returned').toBeTruthy();
+            expect(courses.length).withContext('incorrect number of courses').toBe(12);
             const course = courses.find(course => course.id === 12);
             expect(course.titles.description).toBe('Angular Testing Course');
         });
@@ -47,10 +47,10 @@ describe('CoursesService', () => {
     });
 
     it('should save the course data', () => {
-        const changes: Partial<Course> = { 
-            titles: { 
-                description: 'Testing' 
-            } 
+        const changes: Partial<Course> = {
+            titles: {
+                description: 'Testing'
+            }
         };
         coursesService.saveCourse(12, changes).subscribe(course => {
             expect(course.id).toBe(12);
@@ -65,10 +65,10 @@ describe('CoursesService', () => {
     });
 
     it('should give an error if save course fails', () => {
-        const changes: Partial<Course> = { 
-            titles: { 
-                description: 'Testing' 
-            } 
+        const changes: Partial<Course> = {
+            titles: {
+                description: 'Testing'
+            }
         };
         coursesService.saveCourse(12, changes).subscribe(() => {
             fail('The save course operation should have failed');
@@ -99,6 +99,5 @@ describe('CoursesService', () => {
 
     afterEach(() => {
         httpTestingController.verify();
-    })
-
+    });
 });

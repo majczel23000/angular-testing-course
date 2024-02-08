@@ -13,7 +13,7 @@ describe('CalculatorService', () => {
         // we provide fake service, only testing service should have its instance
         loggerSpy = jasmine.createSpyObj('LoggerService', ['log']);
         // if function of spy service returns value we can mock it:
-        // logger.log.and.returnValue();
+        // loggerSpy.log.and.returnValue();
 
         TestBed.configureTestingModule({
             providers: [
