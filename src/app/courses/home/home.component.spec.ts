@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, flush, waitForAsync } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
 import { HomeComponent } from './home.component';
 import { CoursesModule } from '../courses.module';
@@ -7,6 +7,7 @@ import { CoursesService } from '../services/courses.service';
 import { setupCourses } from '../common/setup-test-data';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
+import { click } from '../common/test-utils';
 
 describe('HomeComponent', () => {
 
@@ -38,42 +39,58 @@ describe('HomeComponent', () => {
       });
   }));
 
-  it("should create the component", () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it("should display only beginner courses", () => {
+  it('should display only beginner courses', () => {
     coursesService.findAllCourses.and.returnValue(of(beginnerCourses));
     fixture.detectChanges();
     const tabs = el.queryAll(By.css('.mdc-tab'));
     expect(tabs.length).toBe(1);
   });
 
-  it("should display only advanced courses", () => {
+  it('should display only advanced courses', () => {
     coursesService.findAllCourses.and.returnValue(of(advancedCourses));
     fixture.detectChanges();
     const tabs = el.queryAll(By.css('.mdc-tab'));
     expect(tabs.length).toBe(1);
   });
 
-  it("should display both tabs", () => {
+  it('should display both tabs', () => {
     coursesService.findAllCourses.and.returnValue(of(setupCourses()));
     fixture.detectChanges();
     const tabs = el.queryAll(By.css('.mdc-tab'));
     expect(tabs.length).toBe(2);
   });
 
-  it("should display advanced courses when tab clicked", () => {
+  it('should display advanced courses when tab clicked', fakeAsync(() => {
     coursesService.findAllCourses.and.returnValue(of(setupCourses()));
     fixture.detectChanges();
     const tabs = el.queryAll(By.css('.mdc-tab'));
-    expect(tabs.length).toBe(2);
-    tabs[1].nativeElement.click();
+    click(tabs[1]);
+    fixture.detectChanges();
+    flush();
     fixture.detectChanges();
     const cardTitles = el.queryAll(By.css('.mat-mdc-card-title'));
     expect(cardTitles.length).toBeGreaterThan(0);
     expect(cardTitles[0].nativeElement.textContent).toContain('Angular Security Course');
-  });
+  }));
+
+  // waitForAsync cannot use flush or tick - it need whenStable().then...
+  it('should display advanced courses when tab clicked - waitForAsync', waitForAsync(() => {
+    coursesService.findAllCourses.and.returnValue(of(setupCourses()));
+    fixture.detectChanges();
+    const tabs = el.queryAll(By.css('.mdc-tab'));
+    click(tabs[1]);
+    fixture.detectChanges();
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+      const cardTitles = el.queryAll(By.css('.mat-mdc-card-title'));
+      expect(cardTitles.length).toBeGreaterThan(0);
+      expect(cardTitles[0].nativeElement.textContent).toContain('Angular Security Course');
+    });
+  }));
 });
 
 
